@@ -12,7 +12,7 @@ We implemented a basic BLAST-like seed-and-extend algorithm based on the impleme
 
 Our database was built by retrieving the first 100 entries that show up in UniProt when querying *"hemoglobin subunit alpha"* in the "Protein Name" advanced search. We downloaded these as a FASTA file and manually modified it to include five *hemoglobin subunit beta* and five *hemoglobin subunit delta* sequences from different species to act as our out-group outliers.
 
-*The final database is accessible in this GitHub repository.*
+*The final database is accessible in this GitHub repository, along with R code and the algorithm.*
 
 ---
 
