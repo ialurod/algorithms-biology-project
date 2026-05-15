@@ -3,7 +3,6 @@
 We implemented a basic BLAST-like seed-and-extend algorithm based on the implementation covered in the practical lessons, with the following nuances:
 * **Scoring:** Instead of using a BLOSUM62 matrix or a similar substitution matrix, we used a simple match/mismatch scoring system.
 * **Extension:** We used a strictly ungapped extension approach.
-* **Filtering:** Instead of using an e-value for appending a result, we used an arbitrary minimum score and systematically varied it.
 * We used Python’s built-in `time` module to compute runtimes.
 
 ---
