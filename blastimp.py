@@ -82,15 +82,15 @@ def run_blast_search(query_seq, database, k_size, threshold):
     return results, end_time - start_time
 
 if __name__ == "__main__":
-    db = load_database("C:/Users/Ian/Documents/AB/Group Project/my_database.fasta")
+    db = load_database("YOUR_DATABASE_DIRECTORY")
     
-    query_id = "sp|P69905|HBA_HUMAN"
-    query_sequence = db[query_id]
+    query_id = "IDENTIFY YOUR QUERY"
+    query_sequence = "YOUR QUERY SEQUENCE"
     
     k_mer_sizes = [2, 3, 4, 5]
     thresholds = [2, 3, 4, 5] 
 
-    with open("C:/Users/Ian/Documents/AB/Group Project/output_file.csv", "wt") as file:
+    with open("output_file.csv", "wt") as file:
         file.write(f"query_id, test_k, test_threshold, globin_hits, outlier_hits, runtime_seconds\n")
         for test_k in k_mer_sizes:
             for test_thresh in thresholds:
@@ -105,8 +105,7 @@ if __name__ == "__main__":
 
                 missing_alphas = [seq_id for seq_id in all_alphas_in_db if seq_id not in hits]
 
-                # 3. Reveal them!
-                print("The 5 Rejected Alpha Globins are:")
+                print("The rejected Alpha Globins are:")
                 for missing in missing_alphas:
                     print(missing)
                 file.write(f"{query_id}, {test_k}, {test_thresh}, {globin_hits}, {outlier_hits}, {search_time:.4f}\n")
