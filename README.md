@@ -1,32 +1,32 @@
 > **Use a simplified BLAST-like seed-and-extend implementation with a protein substitution matrix.**
 
-We evolved our simplified BLAST-like seed-and-extend algorithm into a true similarity-driven heuristic by integrating the **BLOSUM62** substitution matrix directly into the seeding phase:
-* **Similarity Seeding:** Instead of restricting the algorithm to exact K-mer matches, we compute the cumulative substitution score for every query and target K-mer pair using BLOSUM62. A seed is only considered a valid hit and passed to the extension phase if its total score satisfies a minimum **Seed Threshold (T)**.
-* **Algorithmic Optimization:** To eliminate the severe performance bottlenecks caused by millions of matrix lookups within nested loops, we extracted the BLOSUM62 data into a native Python dictionary (`fast_blosum`) and built a **lazy-evaluation score cache**. This optimization completely bypassed redundant calculations, reducing execution time from minutes to seconds.
-* **Extension:** We maintained a strictly ungapped extension approach, keeping the drop-off threshold fixed at 5 while shifting our experimental focus to the optimization of the seed threshold.
+We evolved our simplified BLAST-like seed-and-extend algorithm into a true similarity-driven heuristic by integrating the **BLOSUM62** substitution matrix directly into the seeding phase. To optimize performance, we implemented a lazy-evaluation cache using Python dictionaries, which reduced redundant matrix lookups and significantly improved execution speed.
 
 ---
 
-> **Build a sequence database composed of proteins from a single family (e.g., retrieved from BLAST or Pfam) together with a small number of outliers.**
+> **Build a sequence database composed of proteins from a single family.**
 
-Our database was built by retrieving the first 100 entries that show up in UniProt when querying *"hemoglobin subunit alpha"* in the "Protein Name" advanced search. We downloaded these as a FASTA file and manually modified it to include five *hemoglobin subunit beta* and five *hemoglobin subunit delta* sequences from different species to act as our out-group outliers.
-
-*The final database is accessible in this GitHub repository, along with R code and the algorithm.*
+Our database was built using UniProt entries for *"hemoglobin subunit alpha"*, augmented with five *hemoglobin subunit beta* and five *hemoglobin subunit delta* sequences to serve as structural outliers.
 
 ---
 
-> **Systematically vary the k-mer size and seed threshold, and evaluate their impact on runtime and on the quality of the results obtained.**
+## Performance Analysis
 
-We used human hemoglobin subunit alpha (sp|P69905) as the initial baseline query (0% divergence), alongside synthetically mutated versions at 10%, 20%, and 30% sequence divergence. We systematically tested K-mer sizes ($K \in \{3, 4, 5\}$) against a range of BLOSUM62 Seed Thresholds ($T \in \{10, 13, 16, 19\}$). We stored the output in a CSV file and processed the results using R to analyze accuracy and computational efficiency.
+To validate our implementation, we conducted a systematic analysis across three key dimensions:
 
-<div align="center">
-  <img width="1240" alt="Tradeoff Figure" src="plot_global_balance.png">
-</div>
+### 1. Specificity & Baseline Noise Filtering
+This analysis focuses on our control set (Human Alpha Hemoglobin) and the ability to exclude structural outliers (Beta/Delta chains). The chart below shows that low seed thresholds (T=10) allow significant background noise, whereas higher thresholds (T >= 16) successfully filter out false positives while maintaining high sensitivity.
 
-## Trade-off Analysis (BLOSUM62 Parameter Balancing)
+![Baseline Performance](plot_baseline.png)
 
-After generating the empirical data matrices and R visualizations, we observed the following parameter trade-offs:
+### 2. Sensitivity on Divergent Sequences
+To test evolutionary robustness, we introduced synthetic mutations (10%, 20%, 30% divergence). This plot demonstrates the "evolutionary reach" of our algorithm. By adjusting the BLOSUM62 seed threshold, we can recover distant homologs that would be missed by exact-match algorithms.
 
-* **Sensitivity vs. Specificity (Quality):** A permissive seed threshold ($T = 10$) maximizes sensitivity by capturing distant homologs even at 30% query divergence (recovering up to 90 valid globin hits), but it suffers from poor specificity, allowing structural outliers (Beta/Delta hemoglobin "trampas") to break through as false positives. Conversely, a strict threshold ($T = 19$) removes all background noise but prematurely rejects true positive alignments on highly mutated queries.
-* **Computational Efficiency (Runtime):** Execution times are strongly tied to the interaction between $K$ and $T$. Smaller K-mers ($K = 3$) generate an immense pool of initial seed candidates, forcing more frequent extensions. However, stricter seed thresholds ($T \ge 16$) act as an aggressive early-stage filter, killing weak alignments letter-by-letter before full extension is triggered, significantly optimizing total runtime.
-* **Optimal Parameter Profile:** To achieve an ideal balance between sensitivity on divergent evolutionary lineages and algorithmic speed, we conclude that the optimal parameter profile is **K-mer = 4** and **BLOSUM62 Seed Threshold = 16**. This precise configuration filters out structural noise completely (0 false positives), maintains highly optimized search speeds (~1.5s), and preserves a robust capacity to recover true distant globin relationships across all divergence levels.
+![Divergence Analysis](plot_divergence.png)
+
+### 3. Optimization & Global Trade-off
+Finally, we analyzed the intersection of execution time (efficiency) and retrieval accuracy (sensitivity). This plot identifies the "sweet spot" for our parameters, showing how we balance computational costs with biological discovery.
+
+![Global Balance](plot_global_balance.png)
+
+**Conclusion:** Based on these results, we determined that **K-mer = 4** and **Seed Threshold = 16** provides the optimal balance, ensuring zero false positives, stable performance, and broad sequence coverage.
