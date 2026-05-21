@@ -1,9 +1,9 @@
-> **Use a simplified BLAST-like seed-and-extend implementation.**
+> **Use a simplified BLAST-like seed-and-extend implementation with a protein substitution matrix.**
 
-We implemented a basic BLAST-like seed-and-extend algorithm based on the implementation covered in the practical lessons, with the following nuances:
-* **Scoring:** Instead of a simple match/mismatch scoring system, we used the **BLOSUM62** substitution matrix to evaluate initial K-mer similarity. To avoid computational bottlenecks, we implemented a dictionary-based caching system for rapid score lookups.
-* **Extension:** We used a strictly ungapped extension approach, keeping the drop-off threshold fixed at 5.
-* We used Python’s built-in `time` module to compute runtimes.
+We evolved our simplified BLAST-like seed-and-extend algorithm into a true similarity-driven heuristic by integrating the **BLOSUM62** substitution matrix directly into the seeding phase:
+* **Similarity Seeding:** Instead of restricting the algorithm to exact K-mer matches, we compute the cumulative substitution score for every query and target K-mer pair using BLOSUM62. A seed is only considered a valid hit and passed to the extension phase if its total score satisfies a minimum **Seed Threshold (T)**.
+* **Algorithmic Optimization:** To eliminate the severe performance bottlenecks caused by millions of matrix lookups within nested loops, we extracted the BLOSUM62 data into a native Python dictionary (`fast_blosum`) and built a **lazy-evaluation score cache**. This optimization completely bypassed redundant calculations, reducing execution time from minutes to seconds.
+* **Extension:** We maintained a strictly ungapped extension approach, keeping the drop-off threshold fixed at 5 while shifting our experimental focus to the optimization of the seed threshold.
 
 ---
 
@@ -17,16 +17,16 @@ Our database was built by retrieving the first 100 entries that show up in UniPr
 
 > **Systematically vary the k-mer size and seed threshold, and evaluate their impact on runtime and on the quality of the results obtained.**
 
-We used human hemoglobin subunit alpha (sp|P69905) as the initial baseline query, alongside synthetically mutated versions at 10%, 20%, and 30% divergence. We stored the output in a CSV file and processed the results using several R packages (`ggplot2`, `dplyr`, etc.) to generate our visualizations.
+We used human hemoglobin subunit alpha (sp|P69905) as the initial baseline query (0% divergence), alongside synthetically mutated versions at 10%, 20%, and 30% sequence divergence. We systematically tested K-mer sizes ($K \in \{3, 4, 5\}$) against a range of BLOSUM62 Seed Thresholds ($T \in \{10, 13, 16, 19\}$). We stored the output in a CSV file and processed the results using R to analyze accuracy and computational efficiency.
 
 <div align="center">
   <img width="1240" alt="Tradeoff Figure" src="plot_global_balance.png">
 </div>
 
-## Trade-off Analysis
+## Trade-off Analysis (BLOSUM62 Parameter Balancing)
 
-After generating the similarity score data matrices and R visualizations, we observed the following parameter trade-offs:
+After generating the empirical data matrices and R visualizations, we observed the following parameter trade-offs:
 
-* **Impact on Quality (Sensitivity vs. Specificity):** As the query diverges further from the database, the total number of valid `globin_hits` drops. A permissive BLOSUM seed threshold (T = 10) allows recovering highly mutated sequences (e.g., over 90 hits even at 30% divergence) but sacrifices specificity by capturing false positives (Beta/Delta outliers). Conversely, a strict threshold (T = 19) guarantees zero noise but prematurely rejects valid distant homologs.
-* **Impact on Runtime (Efficiency):** Execution time is highly dependent on the number of seeds evaluated. Smaller K-mer sizes (K = 3) force the algorithm to evaluate vastly more initial sequence pairs, increasing the computational burden. However, our dictionary-based caching system for BLOSUM62 drastically reduced the exponential lookup overhead. Furthermore, stricter seed thresholds actively decrease runtime by filtering out weak matches before the extension phase is ever triggered.
-* **Optimal Parameter Configuration:** To properly balance computational efficiency and alignment accuracy on divergent sequences, we conclude that the optimal parameter profile is **K-mer = 4** and **BLOSUM62 Seed Threshold = 16**. This configuration successfully recovers a high proportion of true globin hits across all divergence levels (safeguarding the detection of distant homologs) while strictly filtering out structural outliers (0 false positives) and maintaining highly stable and optimized execution times (~1.5s).
+* **Sensitivity vs. Specificity (Quality):** A permissive seed threshold ($T = 10$) maximizes sensitivity by capturing distant homologs even at 30% query divergence (recovering up to 90 valid globin hits), but it suffers from poor specificity, allowing structural outliers (Beta/Delta hemoglobin "trampas") to break through as false positives. Conversely, a strict threshold ($T = 19$) removes all background noise but prematurely rejects true positive alignments on highly mutated queries.
+* **Computational Efficiency (Runtime):** Execution times are strongly tied to the interaction between $K$ and $T$. Smaller K-mers ($K = 3$) generate an immense pool of initial seed candidates, forcing more frequent extensions. However, stricter seed thresholds ($T \ge 16$) act as an aggressive early-stage filter, killing weak alignments letter-by-letter before full extension is triggered, significantly optimizing total runtime.
+* **Optimal Parameter Profile:** To achieve an ideal balance between sensitivity on divergent evolutionary lineages and algorithmic speed, we conclude that the optimal parameter profile is **K-mer = 4** and **BLOSUM62 Seed Threshold = 16**. This precise configuration filters out structural noise completely (0 false positives), maintains highly optimized search speeds (~1.5s), and preserves a robust capacity to recover true distant globin relationships across all divergence levels.
