@@ -48,4 +48,10 @@ HBB_TREBE, another fish hemoglobin beta subunit, is consistently passed with dro
 
 > **Perform the analysis on query sequences with different levels of divergence and determine parameter ranges that balance computational efficiency and alignment accuracy.**
 
-VICTOR Y JOSE
+![Divergence Analysis Performance](plot_divergence.png)
+
+To systematically evaluate the algorithm's performance under evolutionary stress, we generated three divergent queries based on the human HBA sequence, introducing random point mutations at rates of 10%, 20%, and 30%. Based on the generated data matrices and R visualizations, we observed the following parameter trade-offs:
+
+* **Impact on Quality (Sensitivity):** As the query diverges further from the database, the total number of valid `globin_hits` drops significantly (from 95 in the baseline down to a maximum of 55 at 30% divergence). Strict drop-off thresholds (T = 2) prematurely terminate the ungapped extension phase when encountering localized mutation noise, causing further hit loss. A higher threshold (T >= 4) is necessary to tolerate these introduced mismatches and recover the maximum possible alignments.
+* **Impact on Runtime (Efficiency):** Execution time decreases as divergence increases due to a severe reduction in exact initial K-mer matches. Furthermore, smaller K-mer sizes (K = 2) consistently bottleneck the algorithm due to the massive generation of initial seeds. For example, at 10% divergence with T = 2, increasing K from 2 to 5 cuts the runtime in half (from 0.0664s to 0.0302s). 
+* **Optimal Parameter Configuration:** To properly balance computational efficiency and alignment accuracy on divergent sequences, we conclude that the optimal parameter range is **K-mer = 4** and **Drop-off Threshold = 4 or 5**. This configuration successfully recovers the maximum possible true globin hits across all divergence levels (e.g., stabilizing at 55 hits for the 30% divergent query) while avoiding the exponential lookup overhead of smaller seeds, maintaining highly optimized execution times (~0.02s).
