@@ -1,17 +1,49 @@
 query_id, test_k, test_threshold, globin_hits, outlier_hits, runtime_seconds
-sp|P69905|HBA_HUMAN, 2, 2, 89, 0, 0.0658
-sp|P69905|HBA_HUMAN, 2, 3, 95, 1, 0.0976
-sp|P69905|HBA_HUMAN, 2, 4, 95, 1, 0.1160
-sp|P69905|HBA_HUMAN, 2, 5, 95, 1, 0.1480
-sp|P69905|HBA_HUMAN, 3, 2, 89, 0, 0.0560
-sp|P69905|HBA_HUMAN, 3, 3, 95, 1, 0.0760
-sp|P69905|HBA_HUMAN, 3, 4, 95, 1, 0.0872
-sp|P69905|HBA_HUMAN, 3, 5, 95, 1, 0.0893
-sp|P69905|HBA_HUMAN, 4, 2, 89, 0, 0.0509
-sp|P69905|HBA_HUMAN, 4, 3, 95, 1, 0.0842
-sp|P69905|HBA_HUMAN, 4, 4, 95, 1, 0.0789
-sp|P69905|HBA_HUMAN, 4, 5, 95, 1, 0.0759
-sp|P69905|HBA_HUMAN, 5, 2, 87, 0, 0.0456
-sp|P69905|HBA_HUMAN, 5, 3, 94, 1, 0.0596
-sp|P69905|HBA_HUMAN, 5, 4, 94, 1, 0.0667
-sp|P69905|HBA_HUMAN, 5, 5, 95, 1, 0.0694
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 3, 10, 68, 0, 0.5029
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 3, 13, 63, 0, 0.4192
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 3, 16, 61, 0, 0.4212
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 3, 19, 60, 0, 0.4357
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 4, 10, 73, 0, 0.6505
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 4, 13, 71, 0, 0.6434
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 4, 16, 67, 0, 0.6122
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 4, 19, 66, 0, 0.6641
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 5, 10, 90, 2, 0.8448
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 5, 13, 79, 2, 0.7959
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 5, 16, 74, 0, 0.8239
+sp|P69905|HBA_HUMAN Hemoglobin subunit alpha OS=Homo sapiens OX=9606 GN=HBA1 PE=1 SV=2, 5, 19, 72, 0, 0.8437
+HBA_divergent_10, 3, 10, 95, 1, 1.2001
+HBA_divergent_10, 3, 13, 95, 1, 1.1283
+HBA_divergent_10, 3, 16, 91, 0, 1.1015
+HBA_divergent_10, 3, 19, 76, 0, 1.0528
+HBA_divergent_10, 4, 10, 99, 7, 1.9022
+HBA_divergent_10, 4, 13, 98, 7, 2.1645
+HBA_divergent_10, 4, 16, 95, 1, 1.9172
+HBA_divergent_10, 4, 19, 94, 0, 1.9603
+HBA_divergent_10, 5, 10, 100, 10, 2.5885
+HBA_divergent_10, 5, 13, 99, 9, 2.0370
+HBA_divergent_10, 5, 16, 98, 7, 2.0163
+HBA_divergent_10, 5, 19, 97, 5, 2.0763
+HBA_divergent_20, 3, 10, 75, 0, 1.2358
+HBA_divergent_20, 3, 13, 72, 0, 1.1207
+HBA_divergent_20, 3, 16, 66, 0, 1.0977
+HBA_divergent_20, 3, 19, 60, 0, 1.0956
+HBA_divergent_20, 4, 10, 92, 1, 1.8881
+HBA_divergent_20, 4, 13, 89, 1, 1.8881
+HBA_divergent_20, 4, 16, 75, 0, 1.7493
+HBA_divergent_20, 4, 19, 70, 0, 1.6905
+HBA_divergent_20, 5, 10, 99, 1, 2.2623
+HBA_divergent_20, 5, 13, 97, 1, 1.9508
+HBA_divergent_20, 5, 16, 93, 0, 1.9834
+HBA_divergent_20, 5, 19, 88, 0, 1.8771
+HBA_divergent_30, 3, 10, 73, 0, 1.1261
+HBA_divergent_30, 3, 13, 63, 0, 0.9618
+HBA_divergent_30, 3, 16, 57, 0, 0.9318
+HBA_divergent_30, 3, 19, 43, 0, 0.9612
+HBA_divergent_30, 4, 10, 90, 0, 1.5649
+HBA_divergent_30, 4, 13, 89, 0, 1.7728
+HBA_divergent_30, 4, 16, 68, 0, 1.7270
+HBA_divergent_30, 4, 19, 59, 0, 1.5113
+HBA_divergent_30, 5, 10, 93, 2, 1.9821
+HBA_divergent_30, 5, 13, 90, 0, 2.0450
+HBA_divergent_30, 5, 16, 90, 0, 2.0727
+HBA_divergent_30, 5, 19, 71, 0, 1.9183

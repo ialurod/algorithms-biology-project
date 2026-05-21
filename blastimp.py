@@ -1,5 +1,12 @@
 import time
 from Bio import SeqIO
+from Bio.Align import substitution_matrices
+
+matrix = substitution_matrices.load("BLOSUM62")
+fast_blosum = {}
+for (a, b), score in matrix.items():
+    fast_blosum[(a, b)] = score
+    fast_blosum[(b, a)] = score
 
 def load_database(filename):
     database = {}
@@ -57,24 +64,36 @@ def extend_seed(query_seq, target_seq, q_start, t_start, k, threshold):
 
     return max_score
 
-def run_blast_search(query_seq, database, k_size, threshold):
+def run_blast_search(query_seq, database, k_size, dropoff_thresh, seed_thresh):
     start_time = time.time()
     query_seeds = get_kmers_with_positions(query_seq, k_size)
     results = {}
+    
+    score_cache = {}
     
     for target_id, target_seq in database.items():
         best_target_score = 0
         target_kmers = get_kmers_with_positions(target_seq, k_size)
         
         for t_kmer, t_positions in target_kmers.items():
-            if t_kmer in query_seeds:
-                q_positions = query_seeds[t_kmer]
-                for q_pos in q_positions:
-                    for t_pos in t_positions:
-                        score = extend_seed(query_seq, target_seq, q_pos, t_pos, k_size, threshold)
-                        if score > best_target_score:
-                            best_target_score = score
-                            
+            for q_kmer, q_positions in query_seeds.items():
+                
+                pair_key = (q_kmer, t_kmer)
+                if pair_key in score_cache:
+                    kmer_score = score_cache[pair_key]
+                else:
+                    kmer_score = 0
+                    for a, b in zip(q_kmer, t_kmer):
+                        kmer_score += fast_blosum.get((a, b), -4)
+                    score_cache[pair_key] = kmer_score
+                
+                if kmer_score >= seed_thresh:
+                    for q_pos in q_positions:
+                        for t_pos in t_positions:
+                            score = extend_seed(query_seq, target_seq, q_pos, t_pos, k_size, dropoff_thresh)
+                            if score > best_target_score:
+                                best_target_score = score
+                                
         if best_target_score >= 10: 
             results[target_id] = best_target_score
             
@@ -82,30 +101,33 @@ def run_blast_search(query_seq, database, k_size, threshold):
     return results, end_time - start_time
 
 if __name__ == "__main__":
-    db = load_database("YOUR_DATABASE_DIRECTORY")
+    db = load_database("my_database.fasta")
     
-    query_id = "IDENTIFY YOUR QUERY"
-    query_sequence = "YOUR QUERY SEQUENCE"
+    with open("HBA_divergent_30.fasta", "r") as f:
+        query_id = f.readline().strip()[1:] 
+        query_sequence = f.readline().strip()
     
-    k_mer_sizes = [2, 3, 4, 5]
-    thresholds = [2, 3, 4, 5] 
+    k_mer_sizes = [3, 4, 5]
+    dropoff_fixed = 5
+    seed_thresholds = [10, 13, 16, 19]
 
-    with open("output_file.csv", "wt") as file:
-        file.write(f"query_id, test_k, test_threshold, globin_hits, outlier_hits, runtime_seconds\n")
+    with open("output_file.csv", "a") as file:
         for test_k in k_mer_sizes:
-            for test_thresh in thresholds:
-                hits, search_time = run_blast_search(query_sequence, db, test_k, test_thresh)
+            for test_seed in seed_thresholds:
+                hits, search_time = run_blast_search(query_sequence, db, test_k, dropoff_fixed, test_seed)
+                
                 globin_hits = sum(1 for seq_id in hits.keys() if "HBA" in seq_id)
                 outlier_hits = sum(1 for seq_id in hits.keys() if "HBA" not in seq_id)
+                
                 for seq_id in hits.keys():
                     if "HBA" not in seq_id:
                         print("I am a captured outlier:", seq_id)
 
                 all_alphas_in_db = [seq_id for seq_id in db.keys() if "HBA" in seq_id]
-
                 missing_alphas = [seq_id for seq_id in all_alphas_in_db if seq_id not in hits]
 
                 print("The rejected Alpha Globins are:")
                 for missing in missing_alphas:
                     print(missing)
-                file.write(f"{query_id}, {test_k}, {test_thresh}, {globin_hits}, {outlier_hits}, {search_time:.4f}\n")
+                
+                file.write(f"{query_id}, {test_k}, {test_seed}, {globin_hits}, {outlier_hits}, {search_time:.4f}\n")
