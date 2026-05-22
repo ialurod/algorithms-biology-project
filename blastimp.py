@@ -103,8 +103,8 @@ def run_blast_search(query_seq, database, k_size, dropoff_thresh, seed_thresh):
 if __name__ == "__main__":
     db = load_database("my_database.fasta")
     
-    with open("HBA_divergent_30.fasta", "r") as f:
-        query_id = f.readline().strip()[1:] 
+    with open("HBA_baseline.fasta", "r") as f:
+        query_id = f.readline().strip()[1:].split(" ")[0]
         query_sequence = f.readline().strip()
     
     k_mer_sizes = [3, 4, 5]
