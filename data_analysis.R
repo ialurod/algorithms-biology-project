@@ -70,7 +70,7 @@ p2 <- ggplot(results_filtered, aes(x = factor(test_k), y = runtime_seconds, grou
 final_plot <- p1 / p2 + plot_layout(heights = c(2, 1))
 print(final_plot)
 
-# --- PLOTS DIVERGENTES (AHORA INCLUYE OUTLIERS) ---
+# --- PLOTS DIVERGENTES  ---
 df_divergent_long <- results %>%
   filter(!grepl("P69905", query_id)) %>% 
   filter(seed_threshold %in% my_thresholds) %>%
@@ -101,7 +101,7 @@ p3 <- ggplot(df_divergent_long, aes(x = factor(test_k), y = Count, fill = Hit_Ty
         strip.background = element_rect(fill = "gray90", color = NA), 
         strip.text = element_text(face = "bold", size = 12))
 
-# Runtime plot para divergentes
+# Runtime
 df_divergent_runtime <- results %>%
   filter(!grepl("P69905", query_id)) %>% 
   filter(seed_threshold %in% my_thresholds) %>%
@@ -124,7 +124,7 @@ p4 <- ggplot(df_divergent_runtime, aes(x = factor(test_k), y = runtime_seconds, 
 divergent_plot <- p3 / p4 + plot_layout(heights = c(3, 1))
 print(divergent_plot)
 
-# --- PLOT GLOBAL TRADE-OFF (AHORA INCLUYE ESTADO DE OUTLIERS) ---
+# --- GLOBAL PLOT TRADE-OFF ---
 df_global <- results %>%
   mutate(
     Divergence = factor(case_when(
@@ -134,7 +134,7 @@ df_global <- results %>%
       grepl("30", query_id) ~ "30% Mutation"
     ), levels = c("0% (Baseline)", "10% Mutation", "20% Mutation", "30% Mutation")),
     
-    # Clasificación avanzada considerando el ruido (Outliers)
+    
     Profile_Class = case_when(
       test_k == 4 & seed_threshold == 16 ~ "Optimal Balance (K=4, Seed=16)",
       outlier_hits == 0 ~ "Suboptimal but Clean (0 Outliers)",
